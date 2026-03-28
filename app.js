@@ -6,6 +6,7 @@ const propertiesPanel = document.getElementById("properties-panel");
 const componentButtons = document.querySelectorAll(".component-btn");
 const clearCanvasBtn = document.getElementById("clear-canvas");
 const previewToggleBtn = document.getElementById("preview-toggle");
+const exportBtn = document.getElementById("export-site");
 
 let blocks = loadBlocks();
 let selectedBlockId = null;
@@ -89,17 +90,17 @@ function renderCanvas() {
     blockEl.dataset.id = block.id;
     blockEl.draggable = !previewMode;
 
-    let inner = "";
-
     const controls = previewMode
       ? ""
       : `
         <div class="block-controls">
-          <button class="control-btn" data-action="up">↑</button>
-          <button class="control-btn" data-action="down">↓</button>
-          <button class="control-btn" data-action="delete">✕</button>
+          <button class="control-btn" data-action="up">⬆ Move</button>
+          <button class="control-btn" data-action="down">⬇ Move</button>
+          <button class="control-btn" data-action="delete">✕ Delete</button>
         </div>
       `;
+
+    let inner = "";
 
     if (block.type === "hero") {
       inner = `
@@ -221,10 +222,12 @@ function renderProperties() {
     return;
   }
 
-  let html = `<div class="field">
-    <label>Block Type</label>
-    <input type="text" value="${block.type}" disabled />
-  </div>`;
+  let html = `
+    <div class="field">
+      <label>Block Type</label>
+      <input type="text" value="${block.type}" disabled />
+    </div>
+  `;
 
   if (block.type === "hero") {
     html += `
@@ -365,6 +368,67 @@ previewToggleBtn.addEventListener("click", () => {
   previewToggleBtn.textContent = previewMode ? "Exit Preview" : "Preview";
   renderCanvas();
 });
+
+if (exportBtn) {
+  exportBtn.addEventListener("click", async () => {
+    const html = generateHTML();
+    const blob = new Blob([html], { type: "text/html" });
+    const file = new File([blob], "site.html", { type: "text/html" });
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Exported Site",
+          text: "Your exported 10Builder site"
+        });
+        return;
+      }
+    } catch (err) {
+      console.log("Share canceled or failed:", err);
+    }
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 10000);
+  });
+}
+
+function generateHTML() {
+  let content = "";
+
+  blocks.forEach((block) => {
+    if (block.type === "hero") {
+      content += `<section><h1>${escapeHtml(block.title)}</h1><p>${escapeHtml(block.text)}</p></section>`;
+    }
+    if (block.type === "text") {
+      content += `<p>${escapeHtml(block.text)}</p>`;
+    }
+    if (block.type === "button") {
+      content += `<a href="${escapeAttribute(block.url)}">${escapeHtml(block.label)}</a>`;
+    }
+    if (block.type === "card") {
+      content += `<div><h3>${escapeHtml(block.title)}</h3><p>${escapeHtml(block.text)}</p></div>`;
+    }
+    if (block.type === "image") {
+      content += `<div>${escapeHtml(block.alt)}</div>`;
+    }
+  });
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Site</title>
+</head>
+<body>
+  ${content}
+</body>
+</html>`;
+}
 
 function escapeHtml(value) {
   return String(value)
