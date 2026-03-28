@@ -1,5 +1,4 @@
 const STORAGE_KEY = "tenbuilder-layout-v2";
-const PUBLISH_KEY = "tenbuilder-published-sites-v1";
 
 const appShell = document.getElementById("app-shell");
 const canvas = document.getElementById("canvas");
@@ -66,19 +65,6 @@ function loadBlocks() {
   } catch {
     return [];
   }
-}
-
-function loadPublishedSites() {
-  try {
-    const raw = localStorage.getItem(PUBLISH_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function savePublishedSites(sites) {
-  localStorage.setItem(PUBLISH_KEY, JSON.stringify(sites));
 }
 
 function renderCanvas() {
@@ -368,7 +354,7 @@ function exportSite() {
 <head>
   <meta charset="UTF-8">
   <title>Exported Site</title>
-  <link rel="stylesheet" href="styles.css?v=300">
+  <link rel="stylesheet" href="styles.css?v=400">
 </head>
 <body>
   ${generatePublishedHTML()}
@@ -380,7 +366,7 @@ function exportSite() {
   window.open(url, "_blank");
 }
 
-function publishSite() {
+async function publishSite() {
   if (blocks.length === 0) {
     alert("Add at least one block before publishing.");
     return;
@@ -390,18 +376,27 @@ function publishSite() {
   if (!input) return;
 
   const slug = slugify(input);
-  const sites = loadPublishedSites();
+  const html = generatePublishedHTML();
 
-  sites[slug] = {
-    slug,
-    html: generatePublishedHTML(),
-    updatedAt: new Date().toISOString()
-  };
+  try {
+    const res = await fetch("/api/publish.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ slug, html })
+    });
 
-  savePublishedSites(sites);
+    const data = await res.json();
 
-  const url = `${window.location.origin}/published.html?site=${encodeURIComponent(slug)}`;
-  window.open(url, "_blank");
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Publish failed");
+    }
+
+    window.open(data.url, "_blank");
+  } catch (err) {
+    alert(`Publish failed: ${err.message}`);
+  }
 }
 
 if (exportBtn) {
