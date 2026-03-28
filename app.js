@@ -97,3 +97,58 @@ exportBtn.onclick = () => {
 };
 
 render();
+function exportSite() {
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Exported Site</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+`;
+
+  blocks.forEach(block => {
+    if (block.type === "hero") {
+      html += `
+        <section>
+          <h1>${block.title}</h1>
+          <p>${block.text}</p>
+        </section>
+      `;
+    }
+
+    if (block.type === "text") {
+      html += `<p>${block.text}</p>`;
+    }
+
+    if (block.type === "button") {
+      html += `<a href="${block.url}">${block.label}</a>`;
+    }
+
+    if (block.type === "card") {
+      html += `
+        <div>
+          <h3>${block.title}</h3>
+          <p>${block.text}</p>
+        </div>
+      `;
+    }
+
+    if (block.type === "image") {
+      html += `<div>${block.alt}</div>`;
+    }
+  });
+
+  html += `
+</body>
+</html>
+`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "index.html";
+  a.click();
+}
