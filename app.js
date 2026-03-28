@@ -1,13 +1,23 @@
+const STORAGE_KEY = "tenbuilder-layout-v2";
+
+const appShell = document.getElementById("app-shell");
 const canvas = document.getElementById("canvas");
 const propertiesPanel = document.getElementById("properties-panel");
 const componentButtons = document.querySelectorAll(".component-btn");
 const clearCanvasBtn = document.getElementById("clear-canvas");
+const previewToggleBtn = document.getElementById("preview-toggle");
 
-let blocks = [];
+let blocks = loadBlocks();
 let selectedBlockId = null;
+let dragSourceId = null;
+let previewMode = false;
+
+function createId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 function createBlock(type) {
-  const id = crypto.randomUUID();
+  const id = createId();
 
   const presets = {
     hero: {
@@ -43,6 +53,19 @@ function createBlock(type) {
   return presets[type];
 }
 
+function saveBlocks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(blocks));
+}
+
+function loadBlocks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
 function renderCanvas() {
   canvas.innerHTML = "";
 
@@ -64,16 +87,23 @@ function renderCanvas() {
     const blockEl = document.createElement("div");
     blockEl.className = `block ${block.type}-block ${block.id === selectedBlockId ? "selected" : ""}`;
     blockEl.dataset.id = block.id;
+    blockEl.draggable = !previewMode;
 
     let inner = "";
 
-    if (block.type === "hero") {
-      inner = `
+    const controls = previewMode
+      ? ""
+      : `
         <div class="block-controls">
           <button class="control-btn" data-action="up">↑</button>
           <button class="control-btn" data-action="down">↓</button>
           <button class="control-btn" data-action="delete">✕</button>
         </div>
+      `;
+
+    if (block.type === "hero") {
+      inner = `
+        ${controls}
         <h1>${escapeHtml(block.title)}</h1>
         <p>${escapeHtml(block.text)}</p>
       `;
@@ -81,33 +111,21 @@ function renderCanvas() {
 
     if (block.type === "text") {
       inner = `
-        <div class="block-controls">
-          <button class="control-btn" data-action="up">↑</button>
-          <button class="control-btn" data-action="down">↓</button>
-          <button class="control-btn" data-action="delete">✕</button>
-        </div>
+        ${controls}
         <p>${escapeHtml(block.text)}</p>
       `;
     }
 
     if (block.type === "button") {
       inner = `
-        <div class="block-controls">
-          <button class="control-btn" data-action="up">↑</button>
-          <button class="control-btn" data-action="down">↓</button>
-          <button class="control-btn" data-action="delete">✕</button>
-        </div>
+        ${controls}
         <a href="${escapeAttribute(block.url)}">${escapeHtml(block.label)}</a>
       `;
     }
 
     if (block.type === "card") {
       inner = `
-        <div class="block-controls">
-          <button class="control-btn" data-action="up">↑</button>
-          <button class="control-btn" data-action="down">↓</button>
-          <button class="control-btn" data-action="delete">✕</button>
-        </div>
+        ${controls}
         <h3>${escapeHtml(block.title)}</h3>
         <p>${escapeHtml(block.text)}</p>
       `;
@@ -115,29 +133,56 @@ function renderCanvas() {
 
     if (block.type === "image") {
       inner = `
-        <div class="block-controls">
-          <button class="control-btn" data-action="up">↑</button>
-          <button class="control-btn" data-action="down">↓</button>
-          <button class="control-btn" data-action="delete">✕</button>
-        </div>
+        ${controls}
         <div class="image-placeholder">${escapeHtml(block.alt)}</div>
       `;
     }
 
     blockEl.innerHTML = inner;
 
-    blockEl.addEventListener("click", (e) => {
-      const action = e.target.dataset.action;
+    if (!previewMode) {
+      blockEl.addEventListener("click", (e) => {
+        const action = e.target.dataset.action;
 
-      if (action) {
-        e.stopPropagation();
-        handleBlockAction(block.id, action, index);
-        return;
-      }
+        if (action) {
+          e.stopPropagation();
+          handleBlockAction(block.id, action, index);
+          return;
+        }
 
-      selectedBlockId = block.id;
-      renderCanvas();
-    });
+        selectedBlockId = block.id;
+        renderCanvas();
+      });
+
+      blockEl.addEventListener("dragstart", () => {
+        dragSourceId = block.id;
+        blockEl.classList.add("dragging");
+      });
+
+      blockEl.addEventListener("dragend", () => {
+        dragSourceId = null;
+        blockEl.classList.remove("dragging");
+        clearDragOverStates();
+      });
+
+      blockEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (dragSourceId !== block.id) {
+          blockEl.classList.add("drag-over");
+        }
+      });
+
+      blockEl.addEventListener("dragleave", () => {
+        blockEl.classList.remove("drag-over");
+      });
+
+      blockEl.addEventListener("drop", (e) => {
+        e.preventDefault();
+        blockEl.classList.remove("drag-over");
+        if (!dragSourceId || dragSourceId === block.id) return;
+        reorderBlocks(dragSourceId, block.id);
+      });
+    }
 
     canvas.appendChild(blockEl);
   });
@@ -145,7 +190,30 @@ function renderCanvas() {
   renderProperties();
 }
 
+function clearDragOverStates() {
+  document.querySelectorAll(".block").forEach((el) => {
+    el.classList.remove("drag-over");
+  });
+}
+
+function reorderBlocks(sourceId, targetId) {
+  const sourceIndex = blocks.findIndex((b) => b.id === sourceId);
+  const targetIndex = blocks.findIndex((b) => b.id === targetId);
+  if (sourceIndex === -1 || targetIndex === -1) return;
+
+  const [moved] = blocks.splice(sourceIndex, 1);
+  blocks.splice(targetIndex, 0, moved);
+
+  saveBlocks();
+  renderCanvas();
+}
+
 function renderProperties() {
+  if (previewMode) {
+    propertiesPanel.innerHTML = `<p class="muted">Preview mode is on.</p>`;
+    return;
+  }
+
   const block = blocks.find((b) => b.id === selectedBlockId);
 
   if (!block) {
@@ -251,6 +319,7 @@ function saveProperties(id) {
     if (alt) block.alt = alt.value;
   }
 
+  saveBlocks();
   renderCanvas();
 }
 
@@ -268,6 +337,7 @@ function handleBlockAction(id, action, index) {
     [blocks[index + 1], blocks[index]] = [blocks[index], blocks[index + 1]];
   }
 
+  saveBlocks();
   renderCanvas();
 }
 
@@ -277,6 +347,7 @@ componentButtons.forEach((btn) => {
     const block = createBlock(type);
     blocks.push(block);
     selectedBlockId = block.id;
+    saveBlocks();
     renderCanvas();
   });
 });
@@ -284,6 +355,14 @@ componentButtons.forEach((btn) => {
 clearCanvasBtn.addEventListener("click", () => {
   blocks = [];
   selectedBlockId = null;
+  saveBlocks();
+  renderCanvas();
+});
+
+previewToggleBtn.addEventListener("click", () => {
+  previewMode = !previewMode;
+  appShell.classList.toggle("preview-mode", previewMode);
+  previewToggleBtn.textContent = previewMode ? "Exit Preview" : "Preview";
   renderCanvas();
 });
 
