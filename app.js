@@ -368,7 +368,7 @@ function exportSite() {
 <head>
   <meta charset="UTF-8">
   <title>Exported Site</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=300">
 </head>
 <body>
   ${generatePublishedHTML()}
@@ -376,10 +376,8 @@ function exportSite() {
 </html>`;
 
   const blob = new Blob([html], { type: "text/html" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "index.html";
-  a.click();
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
 }
 
 function publishSite() {
