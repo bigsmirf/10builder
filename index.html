@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar left">
+      <div class="panel-header">
+        <h2>10Builder</h2>
+        <p>Build smarter. Launch faster. Improve easier.</p>
+      </div>
+
+      <div class="component-list">
+        <button class="component-btn" data-type="hero">+ Hero</button>
+        <button class="component-btn" data-type="text">+ Text Block</button>
+        <button class="component-btn" data-type="button">+ Button</button>
+        <button class="component-btn" data-type="card">+ Card</button>
+        <button class="component-btn" data-type="image">+ Image</button>
+      </div>
+    </aside>
+
+    <main class="canvas-wrap">
+      <div class="topbar">
+        <div>
+          <strong>Builder Canvas</strong>
+          <span class="muted">Hide the chaos. Expose the solution.</span>
+        </div>
+        <button id="clear-canvas" class="danger-btn">Clear Canvas</button>
+      </div>
+
+      <section id="canvas" class="canvas empty">
+        <div class="empty-state">
+          <h3>What do you want to build today?</h3>
+          <p>Add components from the left to start building visually.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="sidebar right">
+      <div class="panel-header">
+        <h2>Properties</h2>
+        <p>Edit the selected block.</p>
+      </div>
+
+      <div id="properties-panel" class="properties-panel">
+        <p class="muted">Select a block to edit it.</p>
+      </div>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
