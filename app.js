@@ -80,7 +80,7 @@ async function publish() {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ slug, html })
+    body: JSON.stringify({ slug, html, user: "wayne" })
   });
 
   const data = await res.json();
