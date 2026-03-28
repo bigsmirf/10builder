@@ -51,7 +51,7 @@ function createBlock(type) {
     }
   };
 
-  return presets[type];
+  return presets[type] || null;
 }
 
 function saveBlocks() {
@@ -278,6 +278,11 @@ componentButtons.forEach((btn) => {
   btn.onclick = () => {
     const type = btn.dataset.type;
     const block = createBlock(type);
+
+    if (!block) {
+      return;
+    }
+
     blocks.push(block);
     selectedBlockId = block.id;
     saveBlocks();
