@@ -66,6 +66,15 @@ body {
   background: #1d4ed8;
 }
 
+.secondary-btn {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.secondary-btn:hover {
+  background: #334155;
+}
+
 .danger-btn {
   width: auto;
   background: #7f1d1d;
@@ -89,6 +98,12 @@ body {
   padding: 18px 24px;
   border-bottom: 1px solid #1f2937;
   background: #0b1220;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .muted {
@@ -129,7 +144,15 @@ body {
   padding: 20px;
   border: 3px solid transparent;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-  cursor: pointer;
+  cursor: grab;
+}
+
+.block.dragging {
+  opacity: 0.45;
+}
+
+.block.drag-over {
+  border-color: #38bdf8;
 }
 
 .block.selected {
@@ -234,6 +257,24 @@ body {
   resize: vertical;
 }
 
+.preview-mode .sidebar {
+  display: none;
+}
+
+.preview-mode .app-shell {
+  grid-template-columns: 1fr;
+}
+
+.preview-mode .topbar {
+  justify-content: flex-end;
+}
+
+.preview-mode .canvas {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 @media (max-width: 1100px) {
   .app-shell {
     grid-template-columns: 240px 1fr;
@@ -260,5 +301,13 @@ body {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .topbar-actions button {
+    width: 100%;
   }
 }
