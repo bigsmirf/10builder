@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Published Site</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="published-root"></div>
+
+  <script>
+    const PUBLISH_KEY = "tenbuilder-published-sites-v1";
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function loadPublishedSites() {
+      try {
+        const raw = localStorage.getItem(PUBLISH_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    const slug = getQueryParam("site");
+    const sites = loadPublishedSites();
+    const root = document.getElementById("published-root");
+
+    if (!slug || !sites[slug]) {
+      root.innerHTML = `
+        <div class="published-shell">
+          <section class="published-card">
+            <h1>Site not found</h1>
+            <p>This published site does not exist on this device yet.</p>
+          </section>
+        </div>
+      `;
+    } else {
+      root.innerHTML = sites[slug].html;
+    }
+  </script>
+</body>
+</html>
