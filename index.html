@@ -6,20 +6,14 @@
   <title>10Builder</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-
   <div id="app-shell">
-
-    <!-- HEADER -->
     <header class="header">
       <h1>10Builder</h1>
       <p>Build smarter. Launch faster. Improve easier.</p>
     </header>
 
     <div class="main">
-
-      <!-- LEFT PANEL -->
       <aside class="sidebar">
         <button class="component-btn" data-type="hero">+ Hero</button>
         <button class="component-btn" data-type="text">+ Text Block</button>
@@ -28,35 +22,30 @@
         <button class="component-btn" data-type="image">+ Image</button>
       </aside>
 
-      <!-- CANVAS AREA -->
       <section class="canvas-area">
-
         <div class="canvas-header">
-          <h2>Builder Canvas</h2>
-          <p>Hide the chaos. Expose the solution.</p>
+          <div>
+            <h2>Builder Canvas</h2>
+            <p>Hide the chaos. Expose the solution.</p>
+          </div>
 
           <div class="canvas-actions">
             <button id="preview-toggle">Preview</button>
             <button id="export-btn">Export</button>
-            <button id="clear-canvas">Clear Canvas</button>
+            <button id="publish-btn" class="primary">Publish</button>
+            <button id="clear-canvas" class="danger">Clear Canvas</button>
           </div>
         </div>
 
         <div id="canvas" class="canvas"></div>
-
       </section>
 
-      <!-- RIGHT PANEL -->
       <aside id="properties-panel" class="properties-panel">
         <p>Select a block to edit it.</p>
       </aside>
-
     </div>
-
   </div>
 
-  <!-- SCRIPT -->
-  <script src="app.js"></script>
-
+  <script src="app.js?v=200"></script>
 </body>
 </html>
