@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b0f1a;
+  color: #fff;
+}
+
+.topbar {
+  padding: 20px;
+  text-align: center;
+}
+
+.builder {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  padding: 20px;
+}
+
+.component-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  padding: 20px;
+}
+
+.canvas-header {
+  margin-bottom: 20px;
+}
+
+.actions button {
+  margin-right: 10px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.canvas {
+  min-height: 400px;
+  background: #111827;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.block {
+  background: #1f2937;
+  padding: 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.properties {
+  width: 250px;
+  padding: 20px;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 8px;
+}
