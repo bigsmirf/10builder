@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Sites</title>
+  <style>
+    body { font-family: Arial; background:#0f172a; color:white; padding:40px; }
+    .site { background:#111827; padding:20px; margin-bottom:15px; border-radius:10px; }
+    a, button { margin-right:10px; }
+  </style>
+</head>
+<body>
+
+<h1>Your Sites</h1>
+<div id="sites"></div>
+
+<script>
+const user = "wayne"; // TEMP USER
+
+async function loadSites() {
+  const res = await fetch(`/api/list.php?user=${user}`);
+  const sites = await res.json();
+
+  const container = document.getElementById("sites");
+  container.innerHTML = "";
+
+  sites.forEach(site => {
+    const div = document.createElement("div");
+    div.className = "site";
+
+    div.innerHTML = `
+      <strong>${site.slug}</strong><br><br>
+      <a href="/sites/${site.slug}/" target="_blank">View</a>
+      <button onclick="deleteSite('${site.slug}')">Delete</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+async function deleteSite(slug) {
+  if (!confirm("Delete this site?")) return;
+
+  await fetch("/api/delete.php", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({slug, user})
+  });
+
+  loadSites();
+}
+
+loadSites();
+</script>
+
+</body>
+</html>
