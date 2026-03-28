@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell" id="app-shell">
     <aside class="sidebar left">
       <div class="panel-header">
         <h2>10Builder</h2>
@@ -29,7 +29,11 @@
           <strong>Builder Canvas</strong>
           <span class="muted">Hide the chaos. Expose the solution.</span>
         </div>
-        <button id="clear-canvas" class="danger-btn">Clear Canvas</button>
+
+        <div class="topbar-actions">
+          <button id="preview-toggle" class="action-btn secondary-btn">Preview</button>
+          <button id="clear-canvas" class="danger-btn">Clear Canvas</button>
+        </div>
       </div>
 
       <section id="canvas" class="canvas empty">
