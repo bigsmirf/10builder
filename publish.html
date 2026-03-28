@@ -4,13 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Published Site</title>
-
-  <!-- FORCE CSS LOAD -->
-  <link rel="stylesheet" href="/styles.css?v=2" />
+  <link rel="stylesheet" href="/styles.css?v=300" />
 </head>
-
 <body>
-
   <div id="published-root"></div>
 
   <script>
@@ -37,16 +33,15 @@
     if (!slug || !sites[slug]) {
       root.innerHTML = `
         <div class="published-shell">
-          <div class="published-card">
+          <section class="published-card">
             <h1>Site not found</h1>
             <p>This published site does not exist on this device yet.</p>
-          </div>
+          </section>
         </div>
       `;
     } else {
       root.innerHTML = sites[slug].html;
     }
   </script>
-
 </body>
 </html>
