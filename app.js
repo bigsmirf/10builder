@@ -40,7 +40,7 @@ function createBlock(type) {
       id,
       type,
       label: "Click Here",
-      url: "#"
+      url: ""
     },
     card: {
       id,
@@ -55,7 +55,7 @@ function createBlock(type) {
     }
   };
 
-  return presets[type];
+  return presets[type] || null;
 }
 
 /* =========================
@@ -111,23 +111,45 @@ function renderCanvas() {
     let inner = "";
 
     if (block.type === "hero") {
-      inner = `${controls}<h1>${escapeHtml(block.title)}</h1><p>${escapeHtml(block.text)}</p>`;
+      inner = `
+        ${controls}
+        <h1>${escapeHtml(block.title)}</h1>
+        <p>${escapeHtml(block.text)}</p>
+      `;
     }
 
     if (block.type === "text") {
-      inner = `${controls}<p>${escapeHtml(block.text)}</p>`;
+      inner = `
+        ${controls}
+        <p>${escapeHtml(block.text)}</p>
+      `;
     }
 
     if (block.type === "button") {
-      inner = `${controls}<p><a href="${escapeAttribute(block.url)}">${escapeHtml(block.label)}</a></p>`;
+      const safeUrl = block.url && block.url.trim() !== "" ? escapeAttribute(block.url) : "";
+      inner = `
+        ${controls}
+        ${
+          safeUrl
+            ? `<p><a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(block.label)}</a></p>`
+            : `<p><a href="" onclick="return false;">${escapeHtml(block.label)}</a></p>`
+        }
+      `;
     }
 
     if (block.type === "card") {
-      inner = `${controls}<h3>${escapeHtml(block.title)}</h3><p>${escapeHtml(block.text)}</p>`;
+      inner = `
+        ${controls}
+        <h3>${escapeHtml(block.title)}</h3>
+        <p>${escapeHtml(block.text)}</p>
+      `;
     }
 
     if (block.type === "image") {
-      inner = `${controls}<div>Image: ${escapeHtml(block.alt)}</div>`;
+      inner = `
+        ${controls}
+        <div>Image: ${escapeHtml(block.alt)}</div>
+      `;
     }
 
     blockEl.innerHTML = inner;
@@ -179,7 +201,7 @@ function renderProperties() {
 
   if (block.type === "hero" || block.type === "card") {
     html += `
-      <input id="prop-title" value="${escapeAttribute(block.title)}"/>
+      <input id="prop-title" value="${escapeAttribute(block.title)}" />
       <textarea id="prop-text">${escapeHtml(block.text)}</textarea>
     `;
   }
@@ -190,13 +212,13 @@ function renderProperties() {
 
   if (block.type === "button") {
     html += `
-      <input id="prop-label" value="${escapeAttribute(block.label)}"/>
-      <input id="prop-url" value="${escapeAttribute(block.url)}"/>
+      <input id="prop-label" value="${escapeAttribute(block.label)}" />
+      <input id="prop-url" value="${escapeAttribute(block.url)}" placeholder="https://example.com" />
     `;
   }
 
   if (block.type === "image") {
-    html += `<input id="prop-alt" value="${escapeAttribute(block.alt)}"/>`;
+    html += `<input id="prop-alt" value="${escapeAttribute(block.alt)}" />`;
   }
 
   html += `<button id="save-properties">Save</button>`;
@@ -214,7 +236,7 @@ function renderProperties() {
 
     if (block.type === "button") {
       block.label = document.getElementById("prop-label").value;
-      block.url = document.getElementById("prop-url").value;
+      block.url = document.getElementById("prop-url").value.trim();
     }
 
     if (block.type === "image") {
@@ -255,6 +277,8 @@ function handleBlockAction(id, action, index) {
 componentButtons.forEach((btn) => {
   btn.onclick = () => {
     const block = createBlock(btn.dataset.type);
+    if (!block) return;
+
     blocks.push(block);
     selectedBlockId = block.id;
     saveBlocks();
@@ -285,23 +309,50 @@ function generatePublishedHTML() {
 
   blocks.forEach((block) => {
     if (block.type === "hero") {
-      content += `<section><h1>${escapeHtml(block.title)}</h1><p>${escapeHtml(block.text)}</p></section>`;
+      content += `
+        <section>
+          <h1>${escapeHtml(block.title)}</h1>
+          <p>${escapeHtml(block.text)}</p>
+        </section>
+      `;
     }
 
     if (block.type === "text") {
-      content += `<section><p>${escapeHtml(block.text)}</p></section>`;
+      content += `
+        <section>
+          <p>${escapeHtml(block.text)}</p>
+        </section>
+      `;
     }
 
     if (block.type === "button") {
-      content += `<section><a href="${escapeAttribute(block.url)}">${escapeHtml(block.label)}</a></section>`;
+      const safeUrl = block.url && block.url.trim() !== "" ? escapeAttribute(block.url) : "";
+      content += `
+        <section>
+          ${
+            safeUrl
+              ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(block.label)}</a>`
+              : `<a href="" onclick="return false;">${escapeHtml(block.label)}</a>`
+          }
+        </section>
+      `;
     }
 
     if (block.type === "card") {
-      content += `<section><h3>${escapeHtml(block.title)}</h3><p>${escapeHtml(block.text)}</p></section>`;
+      content += `
+        <section>
+          <h3>${escapeHtml(block.title)}</h3>
+          <p>${escapeHtml(block.text)}</p>
+        </section>
+      `;
     }
 
     if (block.type === "image") {
-      content += `<section><div>${escapeHtml(block.alt)}</div></section>`;
+      content += `
+        <section>
+          <div>${escapeHtml(block.alt)}</div>
+        </section>
+      `;
     }
   });
 
@@ -311,11 +362,11 @@ function generatePublishedHTML() {
 function exportSite() {
   const html = `<!DOCTYPE html><html><body>${generatePublishedHTML()}</body></html>`;
   const blob = new Blob([html], { type: "text/html" });
-  window.open(URL.createObjectURL(blob));
+  window.open(URL.createObjectURL(blob), "_blank");
 }
 
 /* =========================
-   PUBLISH (REAL SERVER)
+   PUBLISH
 ========================= */
 
 async function publishSite() {
@@ -336,23 +387,26 @@ async function publishSite() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ slug, html })
+      body: JSON.stringify({ slug, html, user: "wayne" })
     });
 
     const data = await res.json();
 
-    if (!data.success) throw new Error(data.error);
+    if (!data.success) {
+      throw new Error(data.error || "Publish failed");
+    }
 
     const panel = document.getElementById("publish-result");
     const link = document.getElementById("publish-link");
 
-    const fullUrl = window.location.origin + data.url;
+    const fullUrl = isAbsoluteUrl(data.url)
+      ? data.url
+      : new URL(data.url, window.location.origin).toString();
 
     link.href = fullUrl;
     link.textContent = fullUrl;
 
     panel.classList.remove("hidden");
-
   } catch (err) {
     alert("Publish failed: " + err.message);
   }
@@ -371,6 +425,10 @@ function slugify(value) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function isAbsoluteUrl(value) {
+  return /^https?:\/\//i.test(String(value));
 }
 
 function escapeHtml(value) {
