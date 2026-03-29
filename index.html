@@ -4,48 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>10Builder</title>
-  <link rel="stylesheet" href="styles.css?v=300" />
+  <link rel="stylesheet" href="styles.css?v=500" />
 </head>
 <body>
-  <div id="app-shell">
-    <header class="header">
-      <h1>10Builder</h1>
-      <p>Build smarter. Launch faster. Improve easier.</p>
-    </header>
 
-    <div class="main">
-      <aside class="sidebar">
-        <button class="component-btn" data-type="hero">+ Hero</button>
-        <button class="component-btn" data-type="text">+ Text Block</button>
-        <button class="component-btn" data-type="button">+ Button</button>
-        <button class="component-btn" data-type="card">+ Card</button>
-        <button class="component-btn" data-type="image">+ Image</button>
-      </aside>
+<div id="app-shell">
 
-      <section class="canvas-area">
-        <div class="canvas-header">
-          <div>
-            <h2>Builder Canvas</h2>
-            <p>Hide the chaos. Expose the solution.</p>
-          </div>
+  <header class="topbar">
+    <h1>10Builder</h1>
+    <div class="topbar-actions">
+      <button id="preview-toggle">Preview</button>
+      <button id="export-btn">Export</button>
+      <button id="publish-btn" class="primary">Publish</button>
+    </div>
+  </header>
 
-          <div class="canvas-actions">
-            <button id="preview-toggle">Preview</button>
-            <button id="export-btn">Export</button>
-            <button id="publish-btn" class="primary">Publish</button>
-            <button id="clear-canvas" class="danger">Clear Canvas</button>
-          </div>
-        </div>
+  <main class="builder">
 
-        <div id="canvas" class="canvas"></div>
-      </section>
+    <aside class="sidebar">
+      <h3>Components</h3>
+      <button class="component-btn" data-type="hero">Hero</button>
+      <button class="component-btn" data-type="text">Text</button>
+      <button class="component-btn" data-type="button">Button</button>
+      <button class="component-btn" data-type="card">Card</button>
+      <button class="component-btn" data-type="image">Image</button>
 
-      <aside id="properties-panel" class="properties-panel">
-        <p>Select a block to edit it.</p>
-      </aside>
+      <button id="clear-canvas" class="danger">Clear</button>
+    </aside>
+
+    <section id="canvas" class="canvas"></section>
+
+    <aside id="properties-panel" class="properties"></aside>
+
+  </main>
+
+  <!-- ✅ Publish Result Panel -->
+  <div id="publish-result" class="publish-result hidden">
+    <div class="publish-box">
+      <h2>🚀 Site Published</h2>
+      <p>Your site is live:</p>
+      <a id="publish-link" target="_blank"></a>
+
+      <div class="mgs-line">
+        Hosted on <strong>MGS™ infrastructure</strong>
+      </div>
+
+      <button onclick="closePublish()">Close</button>
     </div>
   </div>
 
-  <script src="app.js?v=300"></script>
+  <footer class="footer">
+    Powered by <strong>MGS™</strong>
+  </footer>
+
+</div>
+
+<script src="app.js?v=500"></script>
 </body>
 </html>
